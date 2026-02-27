@@ -739,6 +739,19 @@ static void run_tagged_sha256_tests(void) {
     CHECK(secp256k1_memcmp_var(hash32, hash_expected, sizeof(hash32)) == 0);
 }
 
+static void run_sha256_initialize_midstate_tests(void) {
+    /* Midstate for the tagged hash with tag "sha256_midstate_test_tag". */
+    static const unsigned char tag[] = "sha256_midstate_test_tag";
+    static const uint32_t midstate[8] = {
+        0xa9ec59eaul, 0x9b4c2ffful, 0x400821e2ul, 0x0dcf3847ul,
+        0xbe7ea179ul, 0xa5772bdcul, 0x7d29bfe3ul, 0xa486b855ul
+    };
+    secp256k1_sha256 sha;
+
+    secp256k1_sha256_initialize_midstate(&sha, 64, midstate);
+    test_sha256_tag_midstate(&sha, tag, sizeof(tag) - 1);
+}
+
 /***** MODINV TESTS *****/
 
 /* Compute the modular inverse of (odd) x mod 2^64. */
@@ -7750,6 +7763,7 @@ static const struct tf_test_entry tests_hash[] = {
     CASE(hmac_sha256_tests),
     CASE(rfc6979_hmac_sha256_tests),
     CASE(tagged_sha256_tests),
+    CASE(sha256_initialize_midstate_tests),
 };
 
 static const struct tf_test_entry tests_scalar[] = {
@@ -7889,4 +7903,3 @@ int main(int argc, char **argv) {
     if (tf_init(&tf, argc, argv) != 0) return EXIT_FAILURE;
     return tf_run(&tf);
 }
-
